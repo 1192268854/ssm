@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 特定命名空间确认是哪一个类 在ClassesDaoImpl 
+中的getSqlSession().insert("Classes.add", classes); Classes.add与下面一样 -->
+<!-- <mapper namespace="Classes"> -->
+
+<!-- 采用接口的方式必须要写这个接口所在的全路径名称 -->
+<mapper namespace="Classes">
+
+	<!-- parameterType:传过来的参数类型 -->
+	<insert id="add" parameterType="Classes">
+		insert into classes(name)
+		values(#{name})
+	</insert>
+	
+	<insert id="addMore" parameterType="Classes">
+		insert into classes(name) values
+		<foreach collection="list" item="s" separator=",">
+		(#{s.name}})
+		</foreach>
+	</insert>
+	
+	<update id="update" parameterType="Classes">
+		update classes set 
+		name = #{name}
+		where id = #{id}
+	</update>
+	<select id="queryById" resultType="Classes">
+		<!-- select name from classes where id = #{id} -->
+		select name from classes where id = #{id}
+	</select>
+	<!-- mybatis里面有些特殊符号需要用转义符号 如< 为&lt; -->
+	<select id="queryAll" resultType="Classes">
+		select id,name from classes where id&lt;100
+	</select>
+	<select id="queryByPage" parameterType="map" resultType="Classes">
+		select id,name from classes limit #{start},#{pageSize}
+	</select>
+	<select id="queryByname" resultType="Classes">
+	<!-- 
+		select id,name from classes where username like "%"#{username}"%"
+		 -->
+		select id,name from classes where name like concat(concat('%',#{name}),'%')
+	</select>
+	<select id="getTotals" resultType="int">
+		select count(*) from classes
+	</select>
+	<delete id="deleteById">
+		delete from classes where id = #{id}
+	</delete>
+	<delete id="deleteMore">
+		delete from classes where id in
+		<foreach collection="array" open="(" close=")" separator="," item="id">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>
